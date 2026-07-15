@@ -3,18 +3,21 @@ const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const morgan = require("morgan");
 
+const authRoutes = require("./routes/authRoutes");
+
 const app = express();
 
 app.use(cors());
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(morgan("dev"));
 
+app.use("/api/auth", authRoutes);
+
 app.get("/", (req, res) => {
-  res.status(200).json({
+  res.json({
     success: true,
-    message: "AI Job Portal API is running 🚀",
+    message: "AI Job Portal API Running",
   });
 });
 
