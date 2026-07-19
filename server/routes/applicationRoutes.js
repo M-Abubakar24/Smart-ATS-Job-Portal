@@ -7,6 +7,7 @@ const {
   getApplicantsForJob,
   getMyApplications,
   updateApplicationStatus,
+  deleteApplication,
 } = require("../controllers/applicationController");
 
 const {
@@ -37,6 +38,12 @@ router.put(
   protect,
   authorize("recruiter", "admin"),
   updateApplicationStatus
+);
+router.delete(
+  "/:applicationId",
+  protect,
+  authorize("jobseeker"),
+  deleteApplication
 );
 
 module.exports = router;

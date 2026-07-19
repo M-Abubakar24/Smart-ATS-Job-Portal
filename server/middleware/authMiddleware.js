@@ -35,6 +35,13 @@ const protect = async (req, res, next) => {
 module.exports = { protect };
 const authorize = (...roles) => {
   return (req, res, next) => {
+
+    console.log("===== AUTH DEBUG =====");
+    console.log("Allowed Roles:", roles);
+    console.log("User ID:", req.user._id);
+    console.log("User Role:", req.user.role);
+    console.log("======================");
+
     if (!roles.includes(req.user.role)) {
       return res.status(403).json({
         success: false,

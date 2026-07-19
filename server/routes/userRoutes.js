@@ -1,9 +1,18 @@
 const express = require("express");
 const router = express.Router();
 
-const { uploadResume } = require("../controllers/userController");
+const {
+  getProfile,
+  updateProfile,
+  uploadResume,
+} = require("../controllers/userController");
+
 const { protect, authorize } = require("../middleware/authMiddleware");
-const upload = require("../middleware/uploadMiddleware");
+const upload = require("../middleware/upload");
+
+router.get("/profile", protect, getProfile);
+
+router.put("/profile", protect, updateProfile);
 
 router.put(
   "/upload-resume",

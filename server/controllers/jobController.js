@@ -44,15 +44,86 @@ const createJob = async (req, res) => {
 
 const getAllJobs = async (req, res) => {
   try {
-    const jobs = await Job.find()
+    const {
+      keyword,
+      location,
+      employmentType,
+      experienceLevel,
+      minSalary,
+      page = 1,
+      limit = 10,
+      sort = "newest",
+    } = req.query;
+
+   let query = {
+  isActive: true
+};
+
+    // Search by title or company
+    if (keyword) {
+      query.$or = [
+        { title: { $regex: keyword, $options: "i" } },
+        { company: { $regex: keyword, $options: "i" } },
+      ];
+    }
+
+    // Filter by location
+    if (location) {
+      query.location = {
+        $regex: location,
+        $options: "i",
+      };
+    }
+
+    // Filter by employment type
+    if (employmentType) {
+      query.employmentType = employmentType;
+    }
+
+    // Filter by experience level
+    if (experienceLevel) {
+      query.experienceLevel = experienceLevel;
+    }
+
+    // Minimum salary
+    if (minSalary) {
+      query.salary = {
+        $gte: Number(minSalary),
+      };
+    }
+
+    let sortOption = {};
+
+    switch (sort) {
+      case "salary":
+        sortOption = { salary: -1 };
+        break;
+
+      case "oldest":
+        sortOption = { createdAt: 1 };
+        break;
+
+      default:
+        sortOption = { createdAt: -1 };
+    }
+
+    const jobs = await Job.find(query)
       .populate("recruiter", "fullName email")
-      .sort({ createdAt: -1 });
+      .sort(sortOption)
+      .skip((page - 1) * Number(limit))
+      .limit(Number(limit));
+
+    const totalJobs = await Job.countDocuments(query);
 
     res.status(200).json({
       success: true,
+      totalJobs,
+      currentPage: Number(page),
+      totalPages: Math.ceil(totalJobs / Number(limit)),
       count: jobs.length,
       jobs,
     });
+
   } catch (error) {
     res.status(500).json({
       success: false,

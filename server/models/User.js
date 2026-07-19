@@ -37,10 +37,10 @@ const userSchema = new mongoose.Schema(
       default: "",
     },
 
-    resume: {
-      type: String,
-      default: "",
-    },
+   resume: {
+  type: String,
+  default: "",
+},
 
     skills: [
       {

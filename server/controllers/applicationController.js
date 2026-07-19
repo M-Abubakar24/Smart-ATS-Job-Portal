@@ -1,23 +1,45 @@
 const Application = require("../models/Application");
+const User = require("../models/User");
 const Job = require("../models/Job");
-
+const Notification = require("../models/Notification");
 const applyJob = async (req, res) => {
   try {
-    const { coverLetter } = req.body;
 
-    const job = await Job.findById(req.params.jobId);
+    // Only candidates can apply
+   if (req.user.role !== "jobseeker") {
+  return res.status(403).json({
+    success: false,
+    message: "Only jobseekers can apply for jobs.",
+  });
+}
+   const { coverLetter } = req.body;
 
-    if (!job) {
-      return res.status(404).json({
-        success: false,
-        message: "Job not found",
-      });
-    }
+   const job = await Job.findById(req.params.jobId);
 
-    const alreadyApplied = await Application.findOne({
-      applicant: req.user._id,
-      job: job._id,
-    });
+if (!job) {
+  return res.status(404).json({
+    success: false,
+    message: "Job not found",
+  });
+}
+
+
+// Get user's uploaded resume
+const user = await User.findById(req.user._id);
+
+if (!user.resume) {
+  return res.status(400).json({
+    success: false,
+    message: "Please upload your resume before applying.",
+  });
+}
+
+
+const alreadyApplied = await Application.findOne({
+  applicant: req.user._id,
+  job: job._id,
+});
+
 
     if (alreadyApplied) {
       return res.status(400).json({
@@ -26,25 +48,31 @@ const applyJob = async (req, res) => {
       });
     }
 
-    const application = await Application.create({
-      applicant: req.user._id,
-      job: job._id,
-      coverLetter,
-    });
+
+   const application = await Application.create({
+  applicant: req.user._id,
+  job: job._id,
+  coverLetter,
+  resume: user.resume,
+});
+
 
     res.status(201).json({
       success: true,
       message: "Application submitted successfully.",
       application,
     });
+
+
   } catch (error) {
+
     res.status(500).json({
       success: false,
       message: error.message,
     });
+
   }
 };
-
 // Get All Applicants for a Job
 const getApplicantsForJob = async (req, res) => {
   try {
@@ -71,13 +99,16 @@ console.log("Role:", req.user.role);
     }
 
     const applications = await Application.find({
-      job: req.params.jobId,
-    })
-      .populate(
-        "applicant",
-        "fullName email phone location skills experience"
-      )
-      .sort({ createdAt: -1 });
+  job: req.params.jobId,
+})
+.populate(
+  "applicant",
+  "fullName email phone location skills experience resume"
+)
+.select(
+  "applicant resume coverLetter status createdAt"
+)
+.sort({ createdAt: -1 });
 
     res.status(200).json({
       success: true,
@@ -119,7 +150,20 @@ const getMyApplications = async (req, res) => {
 const updateApplicationStatus = async (req, res) => {
   try {
     const { status } = req.body;
+const allowedStatus = [
+  "Pending",
+  "Reviewed",
+  "Accepted",
+  "Rejected",
+];
 
+
+if (!allowedStatus.includes(status)) {
+  return res.status(400).json({
+    success: false,
+    message: "Invalid application status",
+  });
+}
     const application = await Application.findById(req.params.applicationId)
       .populate("job");
 
@@ -129,22 +173,41 @@ const updateApplicationStatus = async (req, res) => {
         message: "Application not found",
       });
     }
+     // 👇 ADD THESE LOGS HERE
+    console.log("========== DEBUG ==========");
+    console.log("Job Recruiter ID:", application.job.recruiter.toString());
+    console.log("Logged-in User ID:", req.user._id.toString());
+    console.log("Logged-in Role:", req.user.role);
+    console.log("===========================");
 
     // Only the recruiter who owns the job or an admin can update it
-    if (
-      application.job.recruiter.toString() !== req.user._id.toString() &&
-      req.user.role !== "admin"
-    ) {
-      return res.status(403).json({
-        success: false,
-        message: "Access denied",
-      });
-    }
+   // Only the recruiter who owns the job or an admin can update it
+if (
+  application.job.recruiter.toString() !== req.user._id.toString() &&
+  req.user.role !== "admin"
+) {
+  return res.status(403).json({
+    success: false,
+    message: "Access denied",
+  });
+}
 
-    application.status = status;
+// Prevent duplicate status updates
+if (application.status === status) {
+  return res.status(400).json({
+    success: false,
+    message: `Application is already ${status}.`,
+  });
+}
 
-    await application.save();
+application.status = status;
 
+await application.save();
+
+await Notification.create({
+  recipient: application.applicant,
+  message: `Your application for "${application.job.title}" has been ${status}.`,
+});
     res.status(200).json({
       success: true,
       message: "Application status updated successfully.",
@@ -157,9 +220,46 @@ const updateApplicationStatus = async (req, res) => {
     });
   }
 };
+// Withdraw Application
+const deleteApplication = async (req, res) => {
+  try {
+    const application = await Application.findById(req.params.applicationId);
+
+    if (!application) {
+      return res.status(404).json({
+        success: false,
+        message: "Application not found",
+      });
+    }
+
+    // Only applicant can withdraw
+    if (
+      application.applicant.toString() !== req.user._id.toString()
+    ) {
+      return res.status(403).json({
+        success: false,
+        message: "Access denied",
+      });
+    }
+
+    await application.deleteOne();
+
+    res.status(200).json({
+      success: true,
+      message: "Application withdrawn successfully.",
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
 module.exports = {
   applyJob,
   getApplicantsForJob,
   getMyApplications,
   updateApplicationStatus,
+  deleteApplication,
 };
