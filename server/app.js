@@ -28,7 +28,7 @@ app.use("/api/job-match", jobMatchRoutes);
 app.get("/", (req, res) => {
   res.json({
     success: true,
-    message: "AI Job Portal API Running",
+    message: "ATS Job Portal API Running",
   });
 });
 
