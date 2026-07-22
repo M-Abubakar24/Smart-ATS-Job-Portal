@@ -1,23 +1,16 @@
-import API from "../api/axios";
+const express = require("express");
+const router = express.Router();
 
-export const loginUser = async (userData) => {
-  const response = await API.post("/auth/login", userData);
-  return response.data;
-};
+const {
+  registerUser,
+  loginUser,
+  getProfile,
+} = require("../controllers/authController");
 
-export const registerUser = async (userData) => {
-  const response = await API.post("/auth/register", userData);
-  return response.data;
-};
+const { protect } = require("../middleware/authMiddleware");
 
-export const getProfile = async () => {
-  const token = localStorage.getItem("token");
+router.post("/register", registerUser);
+router.post("/login", loginUser);
+router.get("/profile", protect, getProfile);
 
-  const response = await API.get("/auth/profile", {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
-
-  return response.data;
-};
+module.exports = router;

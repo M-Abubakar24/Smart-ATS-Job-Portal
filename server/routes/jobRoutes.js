@@ -6,6 +6,7 @@ const {
   createJob,
   getAllJobs,
   getJobById,
+  getMyJobs,
   updateJob,
   deleteJob,
 } = require("../controllers/jobController");
@@ -15,11 +16,25 @@ const {
   authorize,
 } = require("../middleware/authMiddleware");
 
+// =========================
 // Public Routes
+// =========================
+
+// Public
 router.get("/", getAllJobs);
+
+// Recruiter
+router.get(
+  "/my",
+  protect,
+  authorize("recruiter", "admin"),
+  getMyJobs
+);
+
+// Public
 router.get("/:id", getJobById);
 
-// Recruiter/Admin Routes
+// Recruiter
 router.post(
   "/",
   protect,
@@ -40,5 +55,4 @@ router.delete(
   authorize("recruiter", "admin"),
   deleteJob
 );
-
 module.exports = router;

@@ -23,25 +23,34 @@ const Login = () => {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    try {
-      setLoading(true);
+  try {
+    setLoading(true);
 
-      const data = await loginUser(formData);
+    const data = await loginUser(formData);
 
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("user", JSON.stringify(data.user));
+    // Save token & user
+    localStorage.setItem("token", data.token);
+    localStorage.setItem("user", JSON.stringify(data.user));
 
-      alert("Login Successful!");
+    alert("Login Successful!");
 
+    // Redirect based on role
+    if (data.user.role === "recruiter") {
+      navigate("/recruiter/dashboard");
+    } else if (data.user.role === "admin") {
+      navigate("/recruiter/dashboard");
+    } else {
       navigate("/dashboard");
-    } catch (error) {
-      alert(error.response?.data?.message || "Login Failed");
-    } finally {
-      setLoading(false);
     }
-  };
+
+  } catch (error) {
+    alert(error.response?.data?.message || "Login Failed");
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div className="min-h-screen bg-gray-100 flex justify-center items-center px-6">

@@ -1,7 +1,37 @@
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { getDashboard } from "../services/dashboardService";
 
 const Dashboard = () => {
   const user = JSON.parse(localStorage.getItem("user"));
+
+  const [dashboard, setDashboard] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchDashboard();
+  }, []);
+
+  const fetchDashboard = async () => {
+    try {
+      const data = await getDashboard();
+      setDashboard(data.dashboard);
+    } catch (error) {
+  console.log(error.response);
+  console.log(error.response?.data);
+  alert(error.response?.data?.message || "Failed to load dashboard.");
+} finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex justify-center items-center text-2xl font-semibold">
+        Loading Dashboard...
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -16,9 +46,10 @@ const Dashboard = () => {
           Here's what's happening with your job search.
         </p>
 
-        {/* Cards */}
+        {/* Dashboard Cards */}
         <div className="grid md:grid-cols-3 gap-6 mt-10">
 
+          {/* ATS Score */}
           <div className="bg-white rounded-xl shadow p-6">
             <h2 className="text-lg font-semibold">
               ATS Score
@@ -33,13 +64,14 @@ const Dashboard = () => {
             </p>
           </div>
 
+          {/* Applications */}
           <div className="bg-white rounded-xl shadow p-6">
             <h2 className="text-lg font-semibold">
               Applications
             </h2>
 
             <p className="text-4xl font-bold text-indigo-600 mt-4">
-              0
+              {dashboard.totalApplications}
             </p>
 
             <p className="text-gray-500">
@@ -47,17 +79,53 @@ const Dashboard = () => {
             </p>
           </div>
 
+          {/* Pending */}
           <div className="bg-white rounded-xl shadow p-6">
             <h2 className="text-lg font-semibold">
-              Saved Jobs
+              Pending
             </h2>
 
-            <p className="text-4xl font-bold text-indigo-600 mt-4">
-              0
+            <p className="text-4xl font-bold text-yellow-500 mt-4">
+              {dashboard.pending}
             </p>
 
             <p className="text-gray-500">
-              Jobs Saved
+              Applications Pending
+            </p>
+          </div>
+
+        </div>
+
+        {/* Status Cards */}
+        <div className="grid md:grid-cols-3 gap-6 mt-6">
+
+          <div className="bg-white rounded-xl shadow p-6">
+            <h2 className="text-lg font-semibold">
+              Reviewed
+            </h2>
+
+            <p className="text-4xl font-bold text-blue-600 mt-4">
+              {dashboard.reviewed}
+            </p>
+          </div>
+
+          <div className="bg-white rounded-xl shadow p-6">
+            <h2 className="text-lg font-semibold">
+              Accepted
+            </h2>
+
+            <p className="text-4xl font-bold text-green-600 mt-4">
+              {dashboard.accepted}
+            </p>
+          </div>
+
+          <div className="bg-white rounded-xl shadow p-6">
+            <h2 className="text-lg font-semibold">
+              Rejected
+            </h2>
+
+            <p className="text-4xl font-bold text-red-600 mt-4">
+              {dashboard.rejected}
             </p>
           </div>
 

@@ -256,6 +256,7 @@ const deleteApplication = async (req, res) => {
     });
   }
 };
+
 module.exports = {
   applyJob,
   getApplicantsForJob,

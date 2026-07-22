@@ -52,10 +52,11 @@ const jobSchema = new mongoose.Schema(
       },
     ],
 
-    recruiter: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-    },
+   recruiter: {
+  type: mongoose.Schema.Types.ObjectId,
+  ref: "User",
+  required: true,
+},
 
     isActive: {
       type: Boolean,

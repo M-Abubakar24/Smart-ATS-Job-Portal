@@ -1,5 +1,4 @@
 const express = require("express");
-
 const router = express.Router();
 
 const {
@@ -24,7 +23,7 @@ router.get(
 router.get(
   "/jobseeker",
   protect,
-  authorize("jobseeker"),
+  authorize("jobseeker", "admin"),
   jobseekerDashboard
 );
 

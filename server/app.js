@@ -11,6 +11,7 @@ const notificationRoutes = require("./routes/notificationRoutes");
 const savedJobRoutes = require("./routes/savedJobRoutes");
 const jobMatchRoutes = require("./routes/jobMatchRoutes");
 const app = express();
+
 app.use(cors());
 app.use(express.json());
 app.use(cookieParser());
@@ -25,6 +26,7 @@ app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/saved-jobs", savedJobRoutes);
 app.use("/api/job-match", jobMatchRoutes);
+
 app.get("/", (req, res) => {
   res.json({
     success: true,

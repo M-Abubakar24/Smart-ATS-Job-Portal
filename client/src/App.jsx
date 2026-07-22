@@ -11,62 +11,101 @@ import SavedJobs from "./pages/SavedJobs";
 import Applications from "./pages/Applications";
 import Profile from "./pages/Profile";
 import RecruiterDashboard from "./pages/RecruiterDashboard";
+import CreateJob from "./pages/CreateJob";
 import ProtectedRoute from "./components/ProtectedRoute";
-
+import MyJobs from "./pages/MyJobs";
+import Applicants from "./pages/Applicants";
 function App() {
   return (
     <BrowserRouter>
       <Routes>
+
+        {/* Public Routes */}
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/jobs" element={<Jobs />} />
         <Route path="/jobs/:id" element={<JobDetails />} />
+
+        {/* Jobseeker Routes */}
         <Route
-  path="/dashboard"
-  element={
-    <ProtectedRoute>
-      <Dashboard />
-    </ProtectedRoute>
-  }
-/>
+          path="/dashboard"
+          element={
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          }
+        />
 
         <Route
-  path="/ats-analysis"
-  element={
-    <ProtectedRoute>
-      <ATSAnalysis />
-    </ProtectedRoute>
-  }
-/>
-        <Route
-  path="/saved-jobs"
-  element={
-    <ProtectedRoute>
-      <SavedJobs />
-    </ProtectedRoute>
-  }
-/>
-        <Route
-  path="/applications"
-  element={
-    <ProtectedRoute>
-      <Applications />
-    </ProtectedRoute>
-  }
-/>
-       <Route
-  path="/profile"
-  element={
-    <ProtectedRoute>
-      <Profile />
-    </ProtectedRoute>
-  }
-/>
-        <Route
-          path="/recruiter/dashboard"
-          element={<RecruiterDashboard />}
+          path="/ats-analysis"
+          element={
+            <ProtectedRoute>
+              <ATSAnalysis />
+            </ProtectedRoute>
+          }
         />
+
+        <Route
+          path="/saved-jobs"
+          element={
+            <ProtectedRoute>
+              <SavedJobs />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/applications"
+          element={
+            <ProtectedRoute>
+              <Applications />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <Profile />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Recruiter Dashboard */}
+        <Route
+  path="/recruiter/dashboard"
+  element={
+    <ProtectedRoute>
+      <RecruiterDashboard />
+    </ProtectedRoute>
+  }
+/>
+<Route
+  path="/create-job"
+  element={
+    <ProtectedRoute>
+      <CreateJob />
+    </ProtectedRoute>
+  }
+/>
+<Route
+  path="/my-jobs"
+  element={
+    <ProtectedRoute>
+      <MyJobs />
+    </ProtectedRoute>
+  }
+/>
+<Route
+  path="/applicants/:jobId"
+  element={
+    <ProtectedRoute>
+      <Applicants />
+    </ProtectedRoute>
+  }
+/>
       </Routes>
     </BrowserRouter>
   );

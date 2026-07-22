@@ -1,8 +1,9 @@
 const User = require("../models/User");
+const axios = require("axios");
+const pdf = require("pdf-parse");
 
 const uploadResume = async (req, res) => {
   try {
-    // Check if file exists
     if (!req.file) {
       return res.status(400).json({
         success: false,
@@ -10,11 +11,20 @@ const uploadResume = async (req, res) => {
       });
     }
 
-    // Save Cloudinary URL to user
+    // Download PDF from Cloudinary
+    const response = await axios.get(req.file.path, {
+      responseType: "arraybuffer",
+    });
+
+    // Extract text
+    const pdfData = await pdf(Buffer.from(response.data));
+
+    // Save URL + extracted text
     const user = await User.findByIdAndUpdate(
       req.user._id,
       {
         resume: req.file.path,
+        resumeText: pdfData.text,
       },
       {
         new: true,
@@ -28,6 +38,8 @@ const uploadResume = async (req, res) => {
     });
 
   } catch (error) {
+    console.log(error);
+
     res.status(500).json({
       success: false,
       message: error.message,

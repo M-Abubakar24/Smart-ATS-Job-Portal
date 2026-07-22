@@ -21,6 +21,7 @@ export const getProfile = async () => {
 
   return response.data;
 };
+
 export const uploadResume = async (file) => {
   const token = localStorage.getItem("token");
 
@@ -36,6 +37,7 @@ export const uploadResume = async (file) => {
 
   return response.data;
 };
+
 export const analyzeResume = async () => {
   const token = localStorage.getItem("token");
 
