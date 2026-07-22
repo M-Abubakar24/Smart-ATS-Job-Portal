@@ -4,6 +4,7 @@ const router = express.Router();
 const {
   getNotifications,
   markAsRead,
+  deleteNotification,
 } = require("../controllers/notificationController");
 
 const {
@@ -13,5 +14,10 @@ const {
 router.get("/", protect, getNotifications);
 
 router.put("/:id/read", protect, markAsRead);
+router.delete(
+  "/:id",
+  protect,
+  deleteNotification
+);
 
 module.exports = router;

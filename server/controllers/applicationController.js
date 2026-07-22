@@ -204,10 +204,16 @@ application.status = status;
 
 await application.save();
 
+console.log("Creating notification...");
+console.log("Applicant ID:", application.applicant);
+console.log("Status:", status);
+
 await Notification.create({
   recipient: application.applicant,
   message: `Your application for "${application.job.title}" has been ${status}.`,
 });
+
+console.log("Notification created successfully.");
     res.status(200).json({
       success: true,
       message: "Application status updated successfully.",

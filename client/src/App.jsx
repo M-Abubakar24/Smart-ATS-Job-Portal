@@ -15,6 +15,8 @@ import CreateJob from "./pages/CreateJob";
 import ProtectedRoute from "./components/ProtectedRoute";
 import MyJobs from "./pages/MyJobs";
 import Applicants from "./pages/Applicants";
+import Notifications from "./pages/Notifications";
+
 function App() {
   return (
     <BrowserRouter>
@@ -103,6 +105,14 @@ function App() {
   element={
     <ProtectedRoute>
       <Applicants />
+    </ProtectedRoute>
+  }
+/>
+<Route
+  path="/notifications"
+  element={
+    <ProtectedRoute>
+      <Notifications />
     </ProtectedRoute>
   }
 />

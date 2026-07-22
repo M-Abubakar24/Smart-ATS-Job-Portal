@@ -6,7 +6,28 @@ const getToken = () => ({
   },
 });
 
-// Get applicants for a job
+// Apply for a job
+export const applyJob = async (jobId, coverLetter) => {
+  const response = await API.post(
+    `/applications/${jobId}`,
+    { coverLetter },
+    getToken()
+  );
+
+  return response.data;
+};
+
+// Get my applications (Jobseeker)
+export const getMyApplications = async () => {
+  const response = await API.get(
+    "/applications/my",
+    getToken()
+  );
+
+  return response.data;
+};
+
+// Get applicants for a specific job (Recruiter)
 export const getApplicants = async (jobId) => {
   const response = await API.get(
     `/applications/job/${jobId}`,
@@ -24,6 +45,16 @@ export const updateApplicationStatus = async (
   const response = await API.put(
     `/applications/${applicationId}/status`,
     { status },
+    getToken()
+  );
+
+  return response.data;
+};
+
+// Withdraw application
+export const withdrawApplication = async (applicationId) => {
+  const response = await API.delete(
+    `/applications/${applicationId}`,
     getToken()
   );
 
